@@ -1,0 +1,68 @@
+syntax = "proto3";
+import "author.proto";
+
+package attach;
+import "google/protobuf/timestamp.proto";
+
+
+message Attachment {
+  oneof value {
+    Text text = 1;
+    Resource resource = 2;
+    Message message = 3;
+  }
+}
+
+message Resource {
+  Type type = 1;
+  string url = 2;
+  enum Type {
+    UNKNOWN = 0;
+    WEB_PAGE = 1;
+    AUDIO = 2;
+    VIDEO = 3;
+    FILE = 4;
+    PHOTO = 5;
+    STICKER = 6;
+  };
+}
+
+message Text {
+  Type type = 1;
+  string value = 2;
+  enum Type {
+    PLAIN = 0;
+    MARKDOWN = 1;
+  };
+}
+
+message Message {
+  author.Author author = 1;
+  google.protobuf.Timestamp created_at = 2;
+  string content = 3;
+}
+
+enum Type {
+  // string:
+  TEXT = 0;
+  MARKDOWN = 1;
+  LINK = 2;
+  // media:
+  AUDIO = 4;
+  VIDEO = 5;
+  FILE = 8;
+  PHOTO = 6;
+  STICKER = 7;
+  // compound
+  ARTICLE = 10;
+  MESSAGE = 11;
+
+  // GEO =
+  //  GIFT_VK =
+  //  WIDGET_VK =
+  //  GIFT_VK =
+  //  STORIES_VK =
+  //  GRAFFITY_VK =
+  //  POLL =
+}
+

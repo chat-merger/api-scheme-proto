@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package msg;
+import "modificator.proto";
+import "action.proto";
+import "attachment.proto";
+import "google/protobuf/timestamp.proto";
+import "author.proto";
+import "google/protobuf/struct.proto";
+
+message Body {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  string client_name = 3;
+  oneof author {
+    author.Author author_value = 4;
+    google.protobuf.NullValue author_null = 5;
+  }
+  repeated mod.Modificator modifiers = 6;
+  oneof action {
+    action.Type action_value = 7;
+    google.protobuf.NullValue action_null = 8;
+  }
+  repeated attach.Attachment attachments = 9;
+}
