@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package author;
-
-message Author {
-  string author_id = 1;
-  string author_name = 2;
-}
