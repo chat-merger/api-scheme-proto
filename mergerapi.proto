@@ -1,7 +1,7 @@
 syntax="proto3";
 
 package mergerapi;
-
+// test
 option go_package = "./mergerapi";
 option java_package = "./mergerapi";
 option java_outer_classname = "MergerApi";
