@@ -1,7 +1,7 @@
-syntax="proto3";
+syntax = "proto3";
 
 package mergerapi;
-// test
+
 option go_package = "./mergerapi";
 option java_multiple_files = true;
 option java_outer_classname = "MergerApi";
@@ -10,80 +10,31 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";
 
-enum ActionType {
-  NONE = 0;
-  DELETE_MEMBER = 1;
-  JOIN_MEMBER =  2;
-}
-
 
 service BaseService {
-  rpc CreateMessage(stream CreateMessageRequest) returns (stream MsgBody);
-  // todo:
-  rpc Edit(stream google.protobuf.Empty) returns (stream google.protobuf.Empty);
-  rpc Delete(stream google.protobuf.Empty) returns (stream google.protobuf.Empty);
+  rpc Connect(stream Request) returns (stream Response);
 }
 
-message CreateMessageRequest {
-  google.protobuf.Timestamp created_at = 2;
-  oneof author {
-    Author author_value = 3;
-    google.protobuf.NullValue author_null = 4;
-  }
-  repeated Modifier modifiers = 5;
-  oneof action {
-    ActionType action_value = 6;
-    google.protobuf.NullValue action_null = 7;
-  }
-  repeated Attachment attachments = 8;
-}
-
-
-
-message Attachment {
-  oneof value {
-    AttachText text = 1;
-    AttachResource resource = 2;
-    AttachMessage message = 3;
+message Request {
+  oneof body {
+    CreateMessageBody create_msg = 1;
+    DeleteMessageBody delete_msg = 2;
+    EditMessageBody edit_msg = 3;
   }
 }
 
-message AttachResource {
-  Type type = 1;
-  string url = 2;
-  enum Type {
-    UNKNOWN = 0;
-    WEB_PAGE = 1;
-    AUDIO = 2;
-    VIDEO = 3;
-    FILE = 4;
-    PHOTO = 5;
-    STICKER = 6;
-  };
+message Response {
+  oneof event {
+    NewMessageEvent on_create_msg = 1;
+    EditMessageEvent on_delete_msg = 2;
+    DeleteMessageEvent on_edit_msg = 3;
+  }
 }
 
-message AttachText {
-  Type type = 1;
-  string value = 2;
-  enum Type {
-    PLAIN = 0;
-    MARKDOWN = 1;
-  };
-}
-
-message AttachMessage {
-  Author author = 1;
-  google.protobuf.Timestamp created_at = 2;
-  string content = 3;
-}
-
-message Author {
-  string author_id = 1;
-  string author_name = 2;
-}
-
-
-message MsgBody {
+// EVENTS:
+message EditMessageEvent{}
+message DeleteMessageEvent{}
+message NewMessageEvent {
   string id = 1;
   google.protobuf.Timestamp created_at = 2;
   string client_name = 3;
@@ -93,11 +44,30 @@ message MsgBody {
   }
   repeated Modifier modifiers = 6;
   oneof action {
-    ActionType action_value = 7;
+    Action action_value = 7;
     google.protobuf.NullValue action_null = 8;
   }
   repeated Attachment attachments = 9;
 }
+
+// BODIES:
+message EditMessageBody {}
+message DeleteMessageBody {}
+message CreateMessageBody {
+  google.protobuf.Timestamp created_at = 2;
+  oneof author {
+    Author author_value = 3;
+    google.protobuf.NullValue author_null = 4;
+  }
+  repeated Modifier modifiers = 5;
+  oneof action {
+    Action action_value = 6;
+    google.protobuf.NullValue action_null = 7;
+  }
+  repeated Attachment attachments = 8;
+}
+
+// COMMON:
 
 message Modifier {
   oneof value {
@@ -105,4 +75,51 @@ message Modifier {
     bool spoiler = 2;
     google.protobuf.Timestamp timer = 3;
   }
+}
+
+enum Action {
+  DELETE_MEMBER = 0;
+  JOIN_MEMBER = 1;
+}
+
+message Attachment {
+  oneof value {
+    Text text = 1;
+    Resource resource = 2;
+    Message message = 3;
+  }
+
+  message Text {
+    Type type = 1;
+    string value = 2;
+    enum Type {
+      PLAIN = 0;
+      MARKDOWN = 1;
+    };
+  }
+
+  message Resource {
+    Type type = 1;
+    string url = 2;
+    enum Type {
+      UNKNOWN = 0;
+      WEB_PAGE = 1;
+      AUDIO = 2;
+      VIDEO = 3;
+      FILE = 4;
+      PHOTO = 5;
+      STICKER = 6;
+    };
+  }
+
+  message Message {
+    Author author = 1;
+    google.protobuf.Timestamp created_at = 2;
+    string content = 3;
+  }
+}
+
+message Author {
+  string author_id = 1;
+  string author_name = 2;
 }
