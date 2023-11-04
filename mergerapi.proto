@@ -112,7 +112,10 @@ message Attachment {
   }
 
   message Message {
-    Author author = 1;
+    oneof author {
+      Author author_value = 1;
+      google.protobuf.NullValue author_null = 2;
+    }
     google.protobuf.Timestamp created_at = 2;
     string content = 3;
   }
