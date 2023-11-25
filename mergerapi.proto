@@ -14,114 +14,53 @@ service BaseService {
   rpc Connect(stream Request) returns (stream Response);
 }
 
+
+message Text {
+  Format format = 1;
+  string value = 2;
+
+  enum Format {
+    PLAIN = 0;
+    MARKDOWN = 1;
+  }
+}
+message Media {
+  Type type = 1;
+  optional string caption = 2;
+  bool spoiler = 3;
+  string url = 4;
+
+  enum Type {
+    AUDIO = 0;
+    VIDEO = 1;
+    FILE = 2;
+    PHOTO = 3;
+    STICKER = 4;
+  }
+}
+
+// INPUT:
 message Request {
+  int64 created_at = 1;
+  optional string author = 2;
+  bool isSilent = 3;
   oneof body {
-    CreateMessageBody create_msg = 1;
-    DeleteMessageBody delete_msg = 2;
-    EditMessageBody edit_msg = 3;
+    Text text = 4;
+    Media media = 5;
   }
 }
 
+// Message:
 message Response {
-  oneof event {
-    NewMessageEvent on_create_msg = 1;
-    EditMessageEvent on_delete_msg = 2;
-    DeleteMessageEvent on_edit_msg = 3;
-  }
-}
-
-// EVENTS:
-message EditMessageEvent{}
-message DeleteMessageEvent{}
-message NewMessageEvent {
   string id = 1;
-  google.protobuf.Timestamp created_at = 2;
-  string client_name = 3;
-  oneof author {
-    Author author_value = 4;
-    google.protobuf.NullValue author_null = 5;
-  }
-  repeated Modifier modifiers = 6;
-  oneof action {
-    Action action_value = 7;
-    google.protobuf.NullValue action_null = 8;
-  }
-  repeated Attachment attachments = 9;
-}
-
-// BODIES:
-message EditMessageBody {}
-message DeleteMessageBody {}
-message CreateMessageBody {
-  google.protobuf.Timestamp created_at = 2;
-  oneof author {
-    Author author_value = 3;
-    google.protobuf.NullValue author_null = 4;
-  }
-  repeated Modifier modifiers = 5;
-  oneof action {
-    Action action_value = 6;
-    google.protobuf.NullValue action_null = 7;
-  }
-  repeated Attachment attachments = 8;
-}
-
-// COMMON:
-
-message Modifier {
-  oneof value {
-    bool silent = 1;
-    bool spoiler = 2;
-    google.protobuf.Timestamp timer = 3;
-  }
-}
-
-enum Action {
-  DELETE_MEMBER = 0;
-  JOIN_MEMBER = 1;
-}
-
-message Attachment {
-  oneof value {
-    Text text = 1;
-    Resource resource = 2;
-    Message message = 3;
+  optional string reply_msg_id = 1;
+  int64 created_at = 2;
+  optional string author = 4;
+  string client = 3;
+  bool isSilent = 5;
+  oneof body {
+    Text text = 6;
+    Media media = 7;
   }
 
-  message Text {
-    Type type = 1;
-    string value = 2;
-    enum Type {
-      PLAIN = 0;
-      MARKDOWN = 1;
-    };
-  }
-
-  message Resource {
-    Type type = 1;
-    string url = 2;
-    enum Type {
-      UNKNOWN = 0;
-      WEB_PAGE = 1;
-      AUDIO = 2;
-      VIDEO = 3;
-      FILE = 4;
-      PHOTO = 5;
-      STICKER = 6;
-    };
-  }
-
-  message Message {
-    oneof author {
-      Author author_value = 1;
-      google.protobuf.NullValue author_null = 2;
-    }
-    google.protobuf.Timestamp created_at = 3;
-    string content = 4;
-  }
-}
-
-message Author {
-  string author_id = 1;
-  string author_name = 2;
 }
