@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package mergerapi;
+import "google/protobuf/empty.proto";
 
 option go_package = "./pb";
 option java_multiple_files = true;
@@ -8,7 +9,8 @@ option java_outer_classname = "MergerApi";
 
 
 service BaseService {
-  rpc Connect(stream Request) returns (stream Response);
+  rpc Updates(google.protobuf.Empty) returns (stream Response);
+  rpc SendMessage(Request) returns (Response);
 }
 
 
@@ -40,8 +42,8 @@ message Media {
 message Request {
   optional string reply_msg_id = 1;
   int64 created_at = 2;
-  optional string author = 3;
-  bool isSilent = 4;
+  optional string username = 3;
+  bool silent = 4;
   oneof body {
     Text text = 5;
     Media media = 6;
@@ -53,12 +55,11 @@ message Response {
   string id = 1;
   optional string reply_msg_id = 2;
   int64 created_at = 3;
-  optional string author = 4;
+  optional string username = 4;
   string client = 5;
-  bool isSilent = 6;
+  bool silent = 6;
   oneof body {
     Text text = 7;
     Media media = 8;
   }
-
 }
